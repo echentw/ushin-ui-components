@@ -14,9 +14,31 @@ import { SetFocusParams } from "../actions/messageActions";
 
 export interface PointsState {
   byId: {
-    [_id: string]: PointI;
+    [_id: string]: PointI | PointReferenceI;
   };
 }
+
+
+class Point {
+  getAuthor() {
+    if (isquotedpoint) {
+      return appState.points.byId[this.referencePointId].author;
+    } else {
+      return this.author;
+    }
+  }
+}
+
+function getAuthor(pointId, appState) {
+  if (!!appState.points.byId[pointId].referencePointId) {
+    const { referencePointId } = ...;
+    return ...
+  } else {
+    appState.points.byId[pointId].author;
+  }
+}
+
+
 
 export const initialPointsState: PointsState = { byId: {} };
 

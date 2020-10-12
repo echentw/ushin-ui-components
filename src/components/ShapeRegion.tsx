@@ -71,6 +71,7 @@ const ShapeRegion = (props: AllProps) => {
           ? pointIds.length - 1
           : pointIds.length;
 
+      // TODO: some redundant logic, don't need if-else
       //Point was the focus (lacks index)
       if (typeof item.index !== "number") {
         props.pointMove({
