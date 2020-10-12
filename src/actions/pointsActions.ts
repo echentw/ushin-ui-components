@@ -1,5 +1,5 @@
 import { Action, Actions } from "./constants";
-import { PointI, PointShape, PointNoIdI } from "../dataModels";
+import { PointI, PointShape, PointNoIdI } from "../dataModels/dataModels";
 import { v4 as uuidv4 } from "uuid";
 
 export interface PointCreateParams {

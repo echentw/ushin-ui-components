@@ -1,5 +1,5 @@
 import React from "react";
-import { PointShape } from "../dataModels";
+import { PointShape } from "../dataModels/dataModels";
 import styled from "styled-components";
 
 const RegionHeader = (props: { shape: PointShape; darkMode?: boolean }) => {
