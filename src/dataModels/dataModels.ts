@@ -66,6 +66,7 @@ export interface PointReferenceI {
   _id: string;
   referencePointId: string;
   referenceMessageId: string;
+  referenceAuthorId: string;
 }
 
 export type ShapesI = {
