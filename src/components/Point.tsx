@@ -105,6 +105,8 @@ const Point = (props: AllProps) => {
       if (!ref.current || (item.isReferencedPoint && item.shape !== shape)) {
         return;
       }
+
+      // TODO: joseph make new drop ref for region to do this
       if (props.isExpanded !== "expanded") {
         props.setExpandedRegion({ region: shape });
       }
@@ -209,7 +211,7 @@ const Point = (props: AllProps) => {
     if (props.isExpanded === "expanded") {
       e.stopPropagation();
     }
-    if (e.ctrlKey) {
+    if (e.ctrlKey || e.metaKey) {
       props.togglePoint({ pointId });
     } else {
       props.setSelectedPoints({ pointIds: [] });
@@ -359,10 +361,10 @@ const mapStateToProps = (state: AppState, ownProps: OwnProps) => {
 };
 
 const mapActionsToProps = {
-  splitIntoTwoPoints,
-  combinePoints,
-  setCursorPosition,
-  clearCursorPosition,
+  splitIntoTwoPoints, // 
+  combinePoints, //
+  setCursorPosition, // need to change reducer
+  clearCursorPosition,// need to change reducer
   pointMove,
   pointUpdate,
   setMainPoint,

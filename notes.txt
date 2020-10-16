@@ -1,0 +1,6 @@
+parking area
+- points
+- authors
+- messages
+
+move dark mode into redux

@@ -39,14 +39,16 @@ import {
   SelectedPointsState,
 } from "./selectedPoints";
 import { initialPanelsState, panelsReducer, PanelsState } from "./panels";
+import { initialParkedItemsState, parkedItemsReducer, ParkedItemsState } from "./parkedItems";
 
-import { authors, messages, points } from "../constants/initialState";
+import { authors, messages, points, parkedItems } from "../constants/initialState";
 
 // Set this to false if you don't want test data.
 const populate = true;
 const populatedInitialAuthorsState = populate ? authors : null;
 const populatedInitialMessageState = populate ? messages[0] : null;
 const populatedInitialPointsState = populate ? points : null;
+const populatedInitialParkedItemsState = populate ? parkedItems: null;
 
 export interface AppState {
   cursorPosition: CursorPositionState;
@@ -56,6 +58,7 @@ export interface AppState {
   expandedRegion: ExpandedRegionState;
   selectedPoints: SelectedPointsState;
   panels: PanelsState;
+  parkedItems: ParkedItemsState;
 }
 
 function createAppStore() {
@@ -67,6 +70,7 @@ function createAppStore() {
     expandedRegion: initialExpandedRegionState,
     selectedPoints: initialSelectedPointsState,
     panels: initialPanelsState,
+    parkedItems: populatedInitialParkedItemsState ?? initialParkedItemsState,
   };
 
   const appReducer = (state = initialAppState, action: Action): AppState => {
@@ -90,6 +94,7 @@ function createAppStore() {
         state
       ),
       panels: panelsReducer(state.panels, action, state),
+      parkedItems: parkedItemsReducer(state.parkedItems, action, state),
     };
     return newState;
   };

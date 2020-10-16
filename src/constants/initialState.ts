@@ -21,6 +21,7 @@
 import { AuthorsState } from "../reducers/authors";
 import { MessageState } from "../reducers/message";
 import { PointsState } from "../reducers/points";
+import { ParkedItemType, ParkedItemsState } from "../reducers/parkedItems";
 
 export const authors: AuthorsState = {
   byId: {
@@ -34,12 +35,6 @@ export const points: PointsState = {
     pointId1: {
       content: "Online Deliberation",
       _id: "pointId1",
-      shape: "topics",
-      pointDate: new Date(),
-    },
-    pointId6: {
-      content: "Graph database!",
-      _id: "pointId6",
       shape: "topics",
       pointDate: new Date(),
     },
@@ -57,22 +52,9 @@ export const points: PointsState = {
       shape: "actions",
       pointDate: new Date(),
     },
-    REFERENCE_TO_pointId3: {
-      _id: "REFERENCE_TO_pointId3",
-      referencePointId: "pointId3",
-      referenceMessageId: "messageId0",
-      referenceAuthorId: "author2",
-    },
     pointId4: {
       content: "Get plenty of sleep :)",
       _id: "pointId4",
-      shape: "actions",
-      pointDate: new Date(),
-    },
-    pointId7: {
-      content:
-        "Brainstorm and implement other components, including a list view of messages",
-      _id: "pointId7",
       shape: "actions",
       pointDate: new Date(),
     },
@@ -82,6 +64,38 @@ export const points: PointsState = {
       _id: "pointId5",
       shape: "actions",
       pointDate: new Date(),
+    },
+    pointId6: {
+      content: "Graph database!",
+      _id: "pointId6",
+      shape: "topics",
+      pointDate: new Date(),
+    },
+    pointId7: {
+      content:
+        "Brainstorm and implement other components, including a list view of messages",
+      _id: "pointId7",
+      shape: "actions",
+      pointDate: new Date(),
+    },
+    pointId8: {
+      content:
+        "This is a point",
+      _id: "pointId8",
+      shape: "actions",
+      pointDate: new Date(),
+    },
+    REFERENCE_TO_pointId3: {
+      _id: "REFERENCE_TO_pointId3",
+      referencePointId: "pointId3",
+      referenceMessageId: "messageId0",
+      referenceAuthorId: "author2",
+    },
+    ANOTHER_REFERENCE_TO_pointId3: {
+      _id: "ANOTHER_REFERENCE_TO_pointId3",
+      referencePointId: "pointId3",
+      referenceMessageId: "messageId0",
+      referenceAuthorId: "author2",
     },
   },
 };
@@ -110,3 +124,10 @@ export const messages: MessageState[] = [
     createdAt: new Date(),
   },
 ];
+
+export const parkedItems: ParkedItemsState = {
+  items: [
+    { id: "pointId8", type: ParkedItemType.Point },
+    { id: "ANOTHER_REFERENCE_TO_pointId3", type: ParkedItemType.Point },
+  ],
+};

@@ -19,8 +19,40 @@
 import React from "react";
 import styled from "styled-components";
 
-const ParkingSpace = (props: { darkMode: boolean }) => {
-  return <StyledParkingSpace darkMode={props.darkMode}></StyledParkingSpace>;
+import { connect } from "react-redux";
+import { AppState } from "../reducers/store";
+
+import { ParkedItemI } from "../reducers/parkedItems";
+import Point from "./Point";
+
+const ParkingSpace = (props: {
+  darkMode: boolean,
+  items: ParkedItemI[],
+  selectedPoints: string[];
+}) => {
+
+  const pointElements = props.items.map((item: ParkedItemI, index: number) => {
+    return (
+      <Point
+        key={item.id}
+        pointId={item.id}
+        index={index}
+        // TODO: readOnlyOverride
+        readOnly={false}
+        // we won't need this very soon
+        isExpanded={"expanded"}
+        // TODO: move this into mapStateToProps for point
+        isSelected={props.selectedPoints.includes(item.id)}
+        darkMode={props.darkMode}
+      />
+    );
+  });
+
+  return (
+    <StyledParkingSpace darkMode={props.darkMode}>
+      { pointElements }
+    </StyledParkingSpace>
+  );
 };
 
 interface StyledProps {
@@ -34,4 +66,13 @@ const StyledParkingSpace = styled.div<StyledProps>`
   background-color: ${(props) => (props.darkMode ? "#000" : "#fff")};
 `;
 
-export default ParkingSpace;
+const mapStateToProps = (state: AppState) => ({
+  items: state.parkedItems.items,
+  selectedPoints: state.selectedPoints.pointIds,
+});
+
+const mapActionsToProps = {
+};
+
+
+export default connect(mapStateToProps, mapActionsToProps)(ParkingSpace);
