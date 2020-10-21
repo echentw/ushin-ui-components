@@ -37,6 +37,9 @@ export const Actions = {
   combinePoints: "combinePoints",
   splitIntoTwoPoints: "splitIntoTwoPoints",
 
+  beginDrag: "beginDrag",
+  hoverOver: "hoverOver",
+
   setExpandedRegion: "setExpandedRegion",
 
   setSelectedPoints: "setSelectedPoints",

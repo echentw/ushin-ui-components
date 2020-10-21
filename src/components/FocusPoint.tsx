@@ -68,7 +68,7 @@ const FocusPoint = (props: AllProps) => {
 
   const imageUrl = require(`../images/${shape}.svg`);
 
-  const { isDragging, drag, preview } = useDragPoint(pointId);
+  const { isDragging, drag, preview } = useDragPoint(pointId, "focus", 0);
 
   return (
     <StyledSpan

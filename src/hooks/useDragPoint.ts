@@ -21,15 +21,24 @@ import { ItemTypes } from "../constants/React-Dnd";
 import { getPointById, getReferencedPointId } from "../dataModels/getters";
 import { AppState } from "../reducers/store";
 
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { beginDrag } from "../actions/dragActions";
 
-export const useDragPoint = (pointId: string, index?: number) => {
+export const useDragPoint = (pointId: string, region: string, index: number) => {
   const point = useSelector((state: AppState) =>
     getPointById(pointId, state.points)
   );
   const isReferencedPoint = useSelector(
     (state: AppState) => !!getReferencedPointId(pointId, state.points)
   );
+
+  const selectedPointIds = useSelector((state: AppState) => {
+    const selectedPointIds = new Set(state.selectedPoints.pointIds);
+    selectedPointIds.add(pointId);
+    return Array.from(selectedPointIds);
+  });
+
+  const dispatch = useDispatch();
 
   const [{ isDragging }, drag, preview] = useDrag({
     item: {
@@ -39,6 +48,13 @@ export const useDragPoint = (pointId: string, index?: number) => {
       index: index,
       originalShape: point.shape,
       isReferencedPoint,
+    },
+    begin: (monitor) => {
+      dispatch(beginDrag({
+        region: region,
+        index: index,
+        pointIds: selectedPointIds,
+      }));
     },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),

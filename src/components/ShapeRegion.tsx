@@ -44,6 +44,7 @@ import {
   togglePoint,
   TogglePointParams,
 } from "../actions/selectPointActions";
+import { hoverOver, HoverOverParams } from "../actions/dragActions";
 
 interface OwnProps {
   shape: PointShape;
@@ -61,6 +62,7 @@ interface AllProps extends OwnProps {
   selectedPoints: string[];
   togglePoint: (params: TogglePointParams) => void;
   setSelectedPoints: (params: SetSelectedPointsParams) => void;
+  hoverOver: (params: HoverOverParams) => void;
 }
 
 const ShapeRegion = (props: AllProps) => {
@@ -74,35 +76,17 @@ const ShapeRegion = (props: AllProps) => {
         props.setExpandedRegion({ region: shape });
       }
 
-      const newIndex =
-        item.shape === shape && typeof item.index === "number"
-          ? pointIds.length - 1
-          : pointIds.length;
+      const newIndex = pointIds.length;
 
-      // TODO: some redundant logic, don't need if-else
-      //Point was the focus (lacks index)
-      if (typeof item.index !== "number") {
-        props.pointMove({
-          pointId: item.pointId,
-          newShape: shape,
-          newIndex: pointIds.length,
+      //Point wasn't already at the bottom of this region
+      if (item.shape !== shape || item.index !== pointIds.length) {
+        props.hoverOver({
+          region: shape,
+          index: newIndex,
         });
 
         item.index = newIndex;
         item.shape = shape;
-      } else {
-        //Point wasn't already at the bottom of this region
-        if (item.shape !== shape || item.index !== pointIds.length - 1) {
-          props.pointMove({
-            pointId: item.pointId,
-            oldIndex: item.index,
-            newShape: shape,
-            newIndex: newIndex,
-          });
-
-          item.index = newIndex;
-          item.shape = shape;
-        }
       }
     },
   });
@@ -202,6 +186,7 @@ const mapDispatchToProps = {
   setExpandedRegion,
   togglePoint,
   setSelectedPoints,
+  hoverOver,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ShapeRegion);

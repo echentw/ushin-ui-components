@@ -47,6 +47,7 @@ import {
   PointsDeleteParams,
 } from "../actions/pointsActions";
 import { setMainPoint, SetMainPointParams } from "../actions/messageActions";
+import { hoverOver, HoverOverParams } from "../actions/dragActions";
 
 interface OwnProps {
   pointId: string;
@@ -71,6 +72,7 @@ interface AllProps extends OwnProps {
   pointUpdate: (params: PointUpdateParams) => void;
   setMainPoint: (params: SetMainPointParams) => void;
   pointsDelete: (params: PointsDeleteParams) => void;
+  hoverOver: (params: HoverOverParams) => void;
 }
 
 const Point = (props: AllProps) => {
@@ -88,56 +90,43 @@ const Point = (props: AllProps) => {
 
   const [, drop] = useDrop({
     accept: ItemTypes.POINT,
-    hover(item: DraggablePointType, monitor: DropTargetMonitor) {
+    hover: (item: DraggablePointType, monitor: DropTargetMonitor) => {
       if (!ref.current || (item.isReferencedPoint && item.shape !== shape)) {
         return;
       }
 
       const hoverIndex = index;
+      const dragIndex = item.index ?? 0;
 
-      //Point was the focus (lacks index)
-      if (typeof item.index !== "number") {
-        props.pointMove({
-          pointId: item.pointId,
-          newShape: shape,
-          newIndex: hoverIndex,
-        });
-        item.index = hoverIndex;
-        item.shape = shape;
-      } else {
-        const dragIndex = item.index as number;
-        if (dragIndex === hoverIndex) {
-          return;
-        }
-
-        const hoverBoundingRect = ref.current?.getBoundingClientRect();
-
-        const hoverMiddleY =
-          (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
-
-        const clientOffset = monitor.getClientOffset();
-
-        const hoverClientY =
-          (clientOffset as XYCoord).y - hoverBoundingRect.top;
-
-        if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
-          return;
-        }
-
-        if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
-          return;
-        }
-
-        props.pointMove({
-          pointId: item.pointId,
-          oldIndex: item.index,
-          newShape: shape,
-          newIndex: hoverIndex,
-        });
-
-        item.index = hoverIndex;
-        item.shape = shape;
+      if (dragIndex === hoverIndex && item.shape === shape) {
+        return;
       }
+
+      const hoverBoundingRect = ref.current?.getBoundingClientRect();
+
+      const hoverMiddleY =
+        (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+
+      const clientOffset = monitor.getClientOffset();
+
+      const hoverClientY =
+        (clientOffset as XYCoord).y - hoverBoundingRect.top;
+
+      if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
+        return;
+      }
+
+      if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
+        return;
+      }
+
+      item.index = hoverIndex;
+      item.shape = shape;
+
+      props.hoverOver({
+        region: point.shape,
+        index: hoverIndex,
+      });
     },
   });
 
@@ -145,7 +134,7 @@ const Point = (props: AllProps) => {
 
   const pointRef = useRef<HTMLSpanElement>(null);
 
-  const { isDragging, drag, preview } = useDragPoint(pointId, index);
+  const { isDragging, drag, preview } = useDragPoint(pointId, point.shape, index);
 
   drop(preview(pointRef));
 
@@ -340,6 +329,7 @@ const mapActionsToProps = {
   pointUpdate,
   setMainPoint,
   pointsDelete,
+  hoverOver,
 };
 
 export default connect(mapStateToProps, mapActionsToProps)(Point);

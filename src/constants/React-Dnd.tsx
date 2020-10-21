@@ -16,7 +16,7 @@
   You should have received a copy of the GNU Affero General Public License
   along with U4U.  If not, see <https://www.gnu.org/licenses/>.
 */
-import { PointI, PointShape } from "../dataModels/dataModels";
+import { PointI, PointShape, RegionI } from "../dataModels/dataModels";
 
 export const ItemTypes = {
   POINT: "point",
@@ -25,7 +25,8 @@ export const ItemTypes = {
 export interface DraggablePointType {
   type: "point";
   pointId: PointI["_id"];
-  shape: PointShape;
+  // TODO: rename "shape" to "region"
+  shape: RegionI;
   index?: number;
   originalShape: PointShape;
   isReferencedPoint: boolean;
