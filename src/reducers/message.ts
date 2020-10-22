@@ -21,16 +21,21 @@ import { AppState } from "./store";
 import produce from "immer";
 import { v4 as uuidv4 } from "uuid";
 
-import { allPointShapes, ShapesI } from "../dataModels/dataModels";
-import { getPointById, getReferencedPointId } from "../dataModels/getters";
+import { allPointShapes, PointShape, ShapesI } from "../dataModels/dataModels";
+import {
+  getPointById,
+  getReferenceData,
+  getReferencedPointId,
+} from "../dataModels/getters";
 import {
   _PointCreateParams,
-  PointMoveParams,
+  PointsMoveParams,
   PointsDeleteParams,
   CombinePointsParams,
   _SplitIntoTwoPointsParams,
 } from "../actions/pointsActions";
 import { SetFocusParams, SetMainPointParams } from "../actions/messageActions";
+import { DragContext } from "../reducers/drag";
 
 export interface MessageState {
   _id: string;
@@ -67,10 +72,10 @@ export const messageReducer = (
     case Actions.pointCreate:
       newState = handlePointCreate(state, action as Action<_PointCreateParams>);
       break;
-    case Actions.pointMove:
-      newState = handlePointMove(
+    case Actions.pointsMove:
+      newState = handlePointsMove(
         state,
-        action as Action<PointMoveParams>,
+        action as Action<PointsMoveParams>,
         appState
       );
       break;
@@ -137,42 +142,81 @@ function handlePointCreate(
   });
 }
 
-function handlePointMove(
+function handlePointsMove(
   state: MessageState,
-  action: Action<PointMoveParams>,
+  action: Action<PointsMoveParams>,
   appState: AppState
 ): MessageState {
-  //TODO: oldShape also gets defined later in handleSetFocus. Can we
-  //reuse it?
-  const oldShape = getPointById(action.params.pointId, appState.points).shape;
-
-  return produce(state, (draft) => {
-    //If point was the focus (lacks index)...
-    if (typeof action.params.oldIndex !== "number") {
-      draft.shapes[action.params.newShape].splice(
-        action.params.newIndex,
-        0,
-        action.params.pointId
+  //TODO: is there any way to have fewer checks to see if appState.drag.context exists?
+  const newPointIds = [];
+  //TODO: Would it be better to create a type guard or is it safe to
+  //assume that appState.drag.context is not null here?
+  const truthyDragContext = appState.drag.context as DragContext;
+  const shape = truthyDragContext.region as PointShape;
+  for (let i = 0; i < state.shapes[shape].length; i++) {
+    console.log(i);
+    // Push dragged points at the drag context index
+    if (i === truthyDragContext.index) {
+      const pointIdsExcludingReferencePointsWithDifferentShape = truthyDragContext.pointIds.filter(
+        (p) =>
+          !getReferenceData(p, appState.points) ||
+          shape === getPointById(p, appState.points).shape
       );
-      delete draft.focus;
-      //If point was already inside the region...
-    } else if (oldShape === action.params.newShape) {
-      draft.shapes[oldShape].splice(action.params.oldIndex, 1);
-      draft.shapes[oldShape].splice(
-        action.params.newIndex,
-        0,
-        action.params.pointId
-      );
-    } else {
-      draft.shapes[oldShape].splice(action.params.oldIndex, 1);
-      draft.shapes[action.params.newShape].splice(
-        action.params.newIndex,
-        0,
-        action.params.pointId
-      );
+      newPointIds.push(pointIdsExcludingReferencePointsWithDifferentShape);
     }
-  });
+    // Don't push dragged points twice
+    if (!truthyDragContext.pointIds.includes(state.shapes[shape][i])) {
+      //TODO: We will run into an issue here because
+      //state.shapes[shape][i] will never exist when i ===
+      //state.shapes[shape].length
+      newPointIds.push(state.shapes[shape][i]);
+    }
+  }
+  return {
+    ...state,
+    shapes: {
+      ...state.shapes,
+      [shape]: newPointIds,
+    },
+  };
 }
+
+//function handlePointMove(
+//  state: MessageState,
+//  action: Action<PointsMoveParams>,
+//  appState: AppState
+//): MessageState {
+//  //TODO: oldShape also gets defined later in handleSetFocus. Can we
+//  //reuse it?
+//  const oldShape = getPointById(action.params.pointId, appState.points).shape;
+//
+//  return produce(state, (draft) => {
+//    //If point was the focus (lacks index)...
+//    if (typeof action.params.oldIndex !== "number") {
+//      draft.shapes[action.params.newShape].splice(
+//        action.params.newIndex,
+//        0,
+//        action.params.pointId
+//      );
+//      delete draft.focus;
+//      //If point was already inside the region...
+//    } else if (oldShape === action.params.newShape) {
+//      draft.shapes[oldShape].splice(action.params.oldIndex, 1);
+//      draft.shapes[oldShape].splice(
+//        action.params.newIndex,
+//        0,
+//        action.params.pointId
+//      );
+//    } else {
+//      draft.shapes[oldShape].splice(action.params.oldIndex, 1);
+//      draft.shapes[action.params.newShape].splice(
+//        action.params.newIndex,
+//        0,
+//        action.params.pointId
+//      );
+//    }
+//  });
+//}
 
 function handlePointsDelete(
   state: MessageState,

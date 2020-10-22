@@ -39,8 +39,8 @@ import {
   SplitIntoTwoPointsParams,
   combinePoints,
   CombinePointsParams,
-  pointMove,
-  PointMoveParams,
+  pointsMove,
+  PointsMoveParams,
   pointUpdate,
   PointUpdateParams,
   pointsDelete,
@@ -68,7 +68,7 @@ interface AllProps extends OwnProps {
   combinePoints: (params: CombinePointsParams) => void;
   setCursorPosition: (params: CursorPositionParams) => void;
   clearCursorPosition: () => void;
-  pointMove: (params: PointMoveParams) => void;
+  pointsMove: (params: PointsMoveParams) => void;
   pointUpdate: (params: PointUpdateParams) => void;
   setMainPoint: (params: SetMainPointParams) => void;
   pointsDelete: (params: PointsDeleteParams) => void;
@@ -109,8 +109,7 @@ const Point = (props: AllProps) => {
 
       const clientOffset = monitor.getClientOffset();
 
-      const hoverClientY =
-        (clientOffset as XYCoord).y - hoverBoundingRect.top;
+      const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top;
 
       if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
         return;
@@ -128,13 +127,20 @@ const Point = (props: AllProps) => {
         index: hoverIndex,
       });
     },
+    drop: (item: DraggablePointType) => {
+      props.pointsMove({});
+    },
   });
 
   const ref = useRef<HTMLTextAreaElement>(null);
 
   const pointRef = useRef<HTMLSpanElement>(null);
 
-  const { isDragging, drag, preview } = useDragPoint(pointId, point.shape, index);
+  const { isDragging, drag, preview } = useDragPoint(
+    pointId,
+    point.shape,
+    index
+  );
 
   drop(preview(pointRef));
 
@@ -325,7 +331,7 @@ const mapActionsToProps = {
   combinePoints,
   setCursorPosition,
   clearCursorPosition,
-  pointMove,
+  pointsMove,
   pointUpdate,
   setMainPoint,
   pointsDelete,

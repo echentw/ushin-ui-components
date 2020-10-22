@@ -3,27 +3,33 @@ import { AppState } from "./store";
 
 import { BeginDragParams, HoverOverParams } from "../actions/dragActions";
 
+export interface DragContext {
+  index: number;
+  region: string;
+  pointIds: string[];
+}
+
 export interface DragState {
-  context: {
-    index: number;
-    region: string;
-    pointIds: string[];
-  } | null;
+  context: DragContext | null;
 }
 
 export const initialDragState: DragState = {
   context: null,
 };
 
-export const dragReducer = (state: DragState, action: Action, appState: AppState): DragState => {
+export const dragReducer = (
+  state: DragState,
+  action: Action,
+  appState: AppState
+): DragState => {
   let newState = state;
   switch (action.type) {
     case Actions.beginDrag:
       newState = handleBeginDrag(state, action as Action<BeginDragParams>);
-      break
+      break;
     case Actions.hoverOver:
       newState = handleHoverOver(state, action as Action<HoverOverParams>);
-      break
+      break;
   }
 
   console.log(newState);
@@ -31,13 +37,19 @@ export const dragReducer = (state: DragState, action: Action, appState: AppState
   return newState;
 };
 
-function handleBeginDrag(state: DragState, action: Action<BeginDragParams>): DragState {
+function handleBeginDrag(
+  state: DragState,
+  action: Action<BeginDragParams>
+): DragState {
   return {
     context: action.params,
   };
 }
 
-function handleHoverOver(state: DragState, action: Action<HoverOverParams>): DragState {
+function handleHoverOver(
+  state: DragState,
+  action: Action<HoverOverParams>
+): DragState {
   if (state.context === null) {
     return state;
   }

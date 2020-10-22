@@ -24,7 +24,11 @@ import { AppState } from "../reducers/store";
 import { useDispatch, useSelector } from "react-redux";
 import { beginDrag } from "../actions/dragActions";
 
-export const useDragPoint = (pointId: string, region: string, index: number) => {
+export const useDragPoint = (
+  pointId: string,
+  region: string,
+  index: number
+) => {
   const point = useSelector((state: AppState) =>
     getPointById(pointId, state.points)
   );
@@ -50,11 +54,13 @@ export const useDragPoint = (pointId: string, region: string, index: number) => 
       isReferencedPoint,
     },
     begin: (monitor) => {
-      dispatch(beginDrag({
-        region: region,
-        index: index,
-        pointIds: selectedPointIds,
-      }));
+      dispatch(
+        beginDrag({
+          region: region,
+          index: index,
+          pointIds: selectedPointIds,
+        })
+      );
     },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),

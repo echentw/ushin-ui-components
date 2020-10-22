@@ -31,8 +31,8 @@ import { AppState } from "../reducers/store";
 import {
   pointCreate,
   PointCreateParams,
-  pointMove,
-  PointMoveParams,
+  pointsMove,
+  PointsMoveParams,
 } from "../actions/pointsActions";
 import {
   setExpandedRegion,
@@ -57,7 +57,7 @@ interface AllProps extends OwnProps {
   author: AuthorI;
   pointIds: string[];
   pointCreate: (params: PointCreateParams) => void;
-  pointMove: (params: PointMoveParams) => void;
+  pointsMove: (params: PointsMoveParams) => void;
   setExpandedRegion: (params: ExpandedRegionParams) => void;
   selectedPoints: string[];
   togglePoint: (params: TogglePointParams) => void;
@@ -182,7 +182,7 @@ const mapStateToProps = (state: AppState, ownProps: OwnProps) => ({
 
 const mapDispatchToProps = {
   pointCreate,
-  pointMove,
+  pointsMove,
   setExpandedRegion,
   togglePoint,
   setSelectedPoints,

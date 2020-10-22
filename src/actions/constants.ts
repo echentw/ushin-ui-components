@@ -30,7 +30,7 @@ export const Actions = {
   setMessage: "setMessage",
   pointCreate: "pointCreate",
   pointUpdate: "pointUpdate",
-  pointMove: "pointMove",
+  pointsMove: "pointsMove",
   pointsDelete: "pointsDelete",
   setFocus: "setFocus",
   setMainPoint: "setMainPoint",

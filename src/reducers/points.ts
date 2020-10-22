@@ -18,18 +18,23 @@
 */
 import { Action, Actions } from "../actions/constants";
 import produce from "immer";
-import { PointI, PointReferenceI } from "../dataModels/dataModels";
-import { getPointById, getReferencedPointId } from "../dataModels/getters";
+import { PointI, PointReferenceI, PointShape } from "../dataModels/dataModels";
+import {
+  getPointById,
+  getReferenceData,
+  getReferencedPointId,
+} from "../dataModels/getters";
 import { AppState } from "./store";
 import {
   _PointCreateParams,
   PointUpdateParams,
-  PointMoveParams,
+  PointsMoveParams,
   PointsDeleteParams,
   CombinePointsParams,
   _SplitIntoTwoPointsParams,
 } from "../actions/pointsActions";
 import { SetFocusParams } from "../actions/messageActions";
+import { DragContext } from "../reducers/drag";
 
 export interface PointsState {
   byId: {
@@ -52,8 +57,12 @@ export const pointsReducer = (
     case Actions.pointUpdate:
       newState = handlePointUpdate(state, action as Action<PointUpdateParams>);
       break;
-    case Actions.pointMove:
-      newState = handlePointMove(state, action as Action<PointMoveParams>);
+    case Actions.pointsMove:
+      newState = handlePointsMove(
+        state,
+        action as Action<PointsMoveParams>,
+        appState
+      );
       break;
     case Actions.pointsDelete:
       newState = handlePointsDelete(
@@ -103,19 +112,24 @@ function handlePointUpdate(
   });
 }
 
-function handlePointMove(
+function handlePointsMove(
   state: PointsState,
-  action: Action<PointMoveParams>
+  action: Action<PointsMoveParams>,
+  appState: AppState
 ): PointsState {
-  if (
-    getPointById(action.params.pointId, state).shape === action.params.newShape
-  )
-    return state;
+  const truthyDragContext = appState.drag.context as DragContext;
+  const shape = truthyDragContext.region as PointShape;
+  const pointIdsExcludingReferencePoints = truthyDragContext.pointIds.filter(
+    (p) => !getReferenceData(p, state)
+  );
   return produce(state, (draft) => {
-    draft.byId[action.params.pointId] = {
-      ...state.byId[action.params.pointId],
-      shape: action.params.newShape,
-    };
+    pointIdsExcludingReferencePoints.forEach(
+      (id) =>
+        (draft.byId[id] = {
+          ...draft.byId[id],
+          shape,
+        })
+    );
   });
 }
 
