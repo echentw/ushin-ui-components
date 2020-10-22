@@ -46,6 +46,31 @@ import {
 } from "../actions/selectPointActions";
 import { hoverOver, HoverOverParams } from "../actions/dragActions";
 
+const hoverLine = () => <div>hovering here</div>;
+
+const listItem = (args: {
+  id: string;
+  pointIndex: number;
+  hoverIndex?: number;
+  clickHandler: () => void;
+  readOnlyOverride: boolean;
+  isSelected: boolean;
+  darkMode?: boolean;
+}) => {
+  {
+    args.hoverIndex && hoverLine();
+  }
+  <Point
+    key={args.id}
+    pointId={args.id}
+    index={args.pointIndex}
+    onClick={args.clickHandler}
+    readOnlyOverride={args.readOnlyOverride}
+    isSelected={args.isSelected}
+    darkMode={args.darkMode}
+  />;
+};
+
 interface OwnProps {
   shape: PointShape;
   isExpanded: "expanded" | "minimized" | "balanced";
@@ -62,6 +87,7 @@ interface AllProps extends OwnProps {
   selectedPoints: string[];
   togglePoint: (params: TogglePointParams) => void;
   setSelectedPoints: (params: SetSelectedPointsParams) => void;
+  hoverIndex?: number;
   hoverOver: (params: HoverOverParams) => void;
 }
 
@@ -128,6 +154,9 @@ const ShapeRegion = (props: AllProps) => {
       props.setSelectedPoints({ pointIds: [] });
     }
   };
+  //props.selectedPoints.includes(id)}
+  //handlePointClick(id)}
+  //pointIds.findIndex((pId) => pId === id)}
 
   return (
     <StyledRegion
@@ -136,18 +165,18 @@ const ShapeRegion = (props: AllProps) => {
       ref={expandRef}
     >
       <div>
+        {pointIds.map((id, i) => {
+          listItem({
+            id,
+            pointIndex: i,
+            hoverIndex: props.hoverIndex,
+            clickHandler: () => handlePointClick(id),
+            readOnlyOverride: props.readOnlyOverride,
+            isSelected: props.selectedPoints.includes(id),
+            darkMode: props.darkMode,
+          });
+        })}
         <RegionHeader shape={shape} darkMode={props.darkMode} />
-        {pointIds.map((id: string) => (
-          <Point
-            key={id}
-            pointId={id}
-            index={pointIds.findIndex((pId) => pId === id)}
-            onClick={handlePointClick(id)}
-            readOnlyOverride={props.readOnlyOverride}
-            isSelected={props.selectedPoints.includes(id)}
-            darkMode={props.darkMode}
-          />
-        ))}
         {props.isExpanded === "expanded" && !props.readOnlyOverride && (
           <NewPointButton
             shape={shape}
@@ -174,11 +203,17 @@ const DropTargetDiv = styled.div<DropTargetDivProps>`
   height: 100%;
 `;
 
-const mapStateToProps = (state: AppState, ownProps: OwnProps) => ({
-  author: state.authors.byId[state.message.author],
-  pointIds: state.message.shapes[ownProps.shape],
-  selectedPoints: state.selectedPoints.pointIds,
-});
+const mapStateToProps = (state: AppState, ownProps: OwnProps) => {
+  let hoverIndex;
+  if (state.drag.context && state.drag.context.region === ownProps.shape)
+    hoverIndex = state.drag.context.index;
+  return {
+    author: state.authors.byId[state.message.author],
+    pointIds: state.message.shapes[ownProps.shape],
+    selectedPoints: state.selectedPoints.pointIds,
+    hoverIndex,
+  };
+};
 
 const mapDispatchToProps = {
   pointCreate,
