@@ -34,7 +34,6 @@ import {
   _SplitIntoTwoPointsParams,
 } from "../actions/pointsActions";
 import { SetFocusParams } from "../actions/messageActions";
-import { DragContext } from "../reducers/drag";
 
 export interface PointsState {
   byId: {
@@ -117,9 +116,14 @@ function handlePointsMove(
   action: Action<PointsMoveParams>,
   appState: AppState
 ): PointsState {
-  const truthyDragContext = appState.drag.context as DragContext;
-  const shape = truthyDragContext.region as PointShape;
-  const pointIdsExcludingReferencePoints = truthyDragContext.pointIds.filter(
+
+  const context = appState.drag.context;
+  if (context === null) {
+    return state;
+  }
+
+  const shape = context.region as PointShape;
+  const pointIdsExcludingReferencePoints = context.pointIds.filter(
     (p) => !getReferenceData(p, state)
   );
   return produce(state, (draft) => {

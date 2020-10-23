@@ -48,29 +48,6 @@ import { hoverOver, HoverOverParams } from "../actions/dragActions";
 
 const hoverLine = () => <div>hovering here</div>;
 
-const listItem = (args: {
-  id: string;
-  pointIndex: number;
-  hoverIndex?: number;
-  clickHandler: () => void;
-  readOnlyOverride: boolean;
-  isSelected: boolean;
-  darkMode?: boolean;
-}) => {
-  {
-    args.hoverIndex && hoverLine();
-  }
-  <Point
-    key={args.id}
-    pointId={args.id}
-    index={args.pointIndex}
-    onClick={args.clickHandler}
-    readOnlyOverride={args.readOnlyOverride}
-    isSelected={args.isSelected}
-    darkMode={args.darkMode}
-  />;
-};
-
 interface OwnProps {
   shape: PointShape;
   isExpanded: "expanded" | "minimized" | "balanced";
@@ -154,9 +131,22 @@ const ShapeRegion = (props: AllProps) => {
       props.setSelectedPoints({ pointIds: [] });
     }
   };
-  //props.selectedPoints.includes(id)}
-  //handlePointClick(id)}
-  //pointIds.findIndex((pId) => pId === id)}
+
+  const listItems = pointIds.map((id: string, i: number) => (
+    <Point
+      key={id}
+      pointId={id}
+      index={i}
+      onClick={() => handlePointClick(id)}
+      readOnlyOverride={props.readOnlyOverride}
+      isSelected={props.selectedPoints.includes(id)}
+      darkMode={props.darkMode}
+    />
+  ));
+
+  if (props.hoverIndex !== undefined) {
+    listItems.splice(props.hoverIndex, 0, hoverLine());
+  }
 
   return (
     <StyledRegion
@@ -165,17 +155,7 @@ const ShapeRegion = (props: AllProps) => {
       ref={expandRef}
     >
       <div>
-        {pointIds.map((id, i) => {
-          listItem({
-            id,
-            pointIndex: i,
-            hoverIndex: props.hoverIndex,
-            clickHandler: () => handlePointClick(id),
-            readOnlyOverride: props.readOnlyOverride,
-            isSelected: props.selectedPoints.includes(id),
-            darkMode: props.darkMode,
-          });
-        })}
+        { listItems }
         <RegionHeader shape={shape} darkMode={props.darkMode} />
         {props.isExpanded === "expanded" && !props.readOnlyOverride && (
           <NewPointButton

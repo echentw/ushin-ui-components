@@ -3,7 +3,7 @@ import { AppState } from "./store";
 
 import { BeginDragParams, HoverOverParams } from "../actions/dragActions";
 
-export interface DragContext {
+interface DragContext {
   index: number;
   region: string;
   pointIds: string[];
@@ -30,9 +30,9 @@ export const dragReducer = (
     case Actions.hoverOver:
       newState = handleHoverOver(state, action as Action<HoverOverParams>);
       break;
-  }
 
-  console.log(newState);
+    // TODO: handle drop
+  }
 
   return newState;
 };
